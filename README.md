@@ -5,7 +5,20 @@ walk-forward evaluation, transaction costs, and transparent diagnostics.
 
 ## Status
 
-Initial planning stage. No strategy results have been produced yet.
+Package scaffold and input data conventions are in place. No strategy results
+have been produced yet.
+
+## Development setup
+
+Python 3.9 or newer is required. From the repository root:
+
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e .
+```
+
+See [the price data contract](docs/data.md) for input and timing conventions.
 
 ## Research scope
 
@@ -18,7 +31,7 @@ Initial planning stage. No strategy results have been produced yet.
 
 ## Development roadmap
 
-- [ ] Define input data conventions and a minimal Python package.
+- [x] Define input data conventions and a minimal Python package.
 - [ ] Validate prices, missing observations, and date ordering.
 - [ ] Implement lagged momentum signals with synthetic-data tests.
 - [ ] Implement portfolio accounting, turnover, and costs.
