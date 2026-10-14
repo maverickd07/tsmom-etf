@@ -33,7 +33,7 @@ See [the price data contract](docs/data.md) for input and timing conventions.
 
 - [x] Define input data conventions and a minimal Python package.
 - [x] Validate prices, missing observations, and date ordering.
-- [ ] Implement lagged momentum signals with synthetic-data tests.
+- [x] Implement lagged momentum signals with synthetic-data tests.
 - [ ] Implement portfolio accounting, turnover, and costs.
 - [ ] Add volatility targeting and exposure limits.
 - [ ] Add chronological walk-forward evaluation and benchmarks.
@@ -51,3 +51,15 @@ with a line number. Run the synthetic data tests with:
 ```sh
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
+
+## Momentum signals
+
+`tsmom_etf.signals.lagged_momentum(observations, lookback)` compares the
+previous close with the close `lookback` observed intervals earlier, separately
+for each symbol. It returns +1, -1, or 0; warmup observations return `None`.
+The current close cannot affect its own signal. Lookback counts observations,
+so gaps do not create synthetic prices or imply a fixed calendar horizon.
+
+Signals are directions, not executable orders. Portfolio accounting must
+state its fill convention and must not attribute returns preceding execution
+to a newly calculated signal.
