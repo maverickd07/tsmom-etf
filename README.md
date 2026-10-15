@@ -34,7 +34,7 @@ See [the price data contract](docs/data.md) for input and timing conventions.
 - [x] Define input data conventions and a minimal Python package.
 - [x] Validate prices, missing observations, and date ordering.
 - [x] Implement lagged momentum signals with synthetic-data tests.
-- [ ] Implement portfolio accounting, turnover, and costs.
+- [x] Implement portfolio accounting, turnover, and costs.
 - [ ] Add volatility targeting and exposure limits.
 - [ ] Add chronological walk-forward evaluation and benchmarks.
 - [ ] Add diagnostics and a reproducible example.
@@ -63,3 +63,20 @@ so gaps do not create synthetic prices or imply a fixed calendar horizon.
 Signals are directions, not executable orders. Portfolio accounting must
 state its fill convention and must not attribute returns preceding execution
 to a newly calculated signal.
+
+## Portfolio accounting
+
+`tsmom_etf.accounting.account_portfolio` accepts a synchronized price panel
+and explicit share holdings executed at dated closes. Existing holdings earn
+the move into each close; trades then update cash and incur proportional
+costs on absolute traded notional (buys plus sells). Unchanged share targets
+incur no turnover. Missing symbols in a target are liquidated; absent target
+dates retain existing holdings. Missing price rows are rejected rather than
+silently filled. Results include gross P&L, traded notional, costs, cash, and
+equity. Traded notional divided by initial capital is fixed-capital turnover.
+
+The caller must supply orders known before their fill. This ledger does not
+convert signals to executable orders or model fill delays. Adjusted prices
+and share quantities represent synthetic total-return units. Short positions
+and borrowing are permitted, but financing, borrow fees, cash interest, and
+execution slippage beyond the configured basis-point charge are excluded.
