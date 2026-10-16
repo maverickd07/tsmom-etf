@@ -107,3 +107,14 @@ Fit or select parameters using only each training slice, freeze the selection,
 then evaluate its test slice. Later training windows may include earlier test
 data, as it would then be historical. The splitter does not itself fit models,
 compute benchmarks, or prevent leakage inside caller-provided feature code.
+
+## Benchmarks
+
+`tsmom_etf.benchmarks.equal_weight_buy_and_hold` invests equal notional amounts
+at the first close and holds fixed fractional shares thereafter. Entry costs
+are reserved from capital, weights drift with prices, and open holdings are
+marked to market without assumed final liquidation. `cash_benchmark` holds
+cash with zero interest. Both use the strategy accounting ledger and validate
+the synchronized price panel. Compare strategies over identical evaluation
+dates, capital, and cost assumptions; these helpers do not select parameters
+or run walk-forward evaluation themselves.
