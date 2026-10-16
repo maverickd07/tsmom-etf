@@ -95,3 +95,15 @@ weights. Per-asset scaling alone does not target portfolio volatility because
 it ignores asset correlations. These functions produce research weights;
 execution timing, conversion to shares, and trading costs remain explicit
 responsibilities of the backtest integration.
+
+## Walk-forward splits
+
+`tsmom_etf.evaluation.walk_forward_splits` returns half-open training and test
+row slices over unique, increasing session dates. It supports rolling or
+expanding training, an optional gap, and nonoverlapping complete test blocks;
+a partial trailing block is omitted. Sizes and gaps count observed sessions.
+
+Fit or select parameters using only each training slice, freeze the selection,
+then evaluate its test slice. Later training windows may include earlier test
+data, as it would then be historical. The splitter does not itself fit models,
+compute benchmarks, or prevent leakage inside caller-provided feature code.
