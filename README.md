@@ -35,7 +35,7 @@ See [the price data contract](docs/data.md) for input and timing conventions.
 - [x] Validate prices, missing observations, and date ordering.
 - [x] Implement lagged momentum signals with synthetic-data tests.
 - [x] Implement portfolio accounting, turnover, and costs.
-- [ ] Add volatility targeting and exposure limits.
+- [x] Add volatility targeting and exposure limits.
 - [ ] Add chronological walk-forward evaluation and benchmarks.
 - [ ] Add diagnostics and a reproducible example.
 
@@ -80,3 +80,18 @@ convert signals to executable orders or model fill delays. Adjusted prices
 and share quantities represent synthetic total-return units. Short positions
 and borrowing are permitted, but financing, borrow fees, cash interest, and
 execution slippage beyond the configured basis-point charge are excluded.
+
+## Risk controls
+
+`tsmom_etf.risk.lagged_volatility_scale` estimates annualized sample volatility
+from a rolling window of prior simple returns. It excludes the current return,
+returns `None` during warmup, caps per-asset exposure, and assigns zero exposure
+when measured volatility is zero. The default annualization is 252 equally
+spaced sessions per year; this is an assumption, not a calendar-gap repair.
+
+Multiply each scale by an already available momentum direction, then use
+`cap_gross_exposure` to proportionally constrain the sum of absolute portfolio
+weights. Per-asset scaling alone does not target portfolio volatility because
+it ignores asset correlations. These functions produce research weights;
+execution timing, conversion to shares, and trading costs remain explicit
+responsibilities of the backtest integration.
