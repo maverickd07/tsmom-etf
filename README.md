@@ -129,3 +129,16 @@ close-to-close returns with an explicit sessions-per-year assumption; it is
 undefined (`None`) with fewer than two intervals. Nonpositive equity is
 rejected. These summaries do not infer risk-free rates, financing costs, or
 statistical significance and do not replace out-of-sample evaluation.
+
+## Strategy execution
+
+`tsmom_etf.strategy.run_momentum` connects lagged directions, prior-return
+volatility scaling, gross-weight limits, and the cost ledger. Orders are sized
+in shares using the preceding close and fixed initial capital, filled at the
+next close, and earn returns only after that fill. Capital is not compounded
+into new order sizes. Warmup and zero-volatility periods target zero holdings.
+
+Exposure limits apply at order sizing; intervening price moves can exceed
+those limits at execution. This daily close model allows shorts and negative
+cash, omits financing and borrow fees, and assumes fractional adjusted-price
+units. It is a reproducible research convention, not an execution simulator.
