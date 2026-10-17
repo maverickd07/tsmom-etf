@@ -36,7 +36,7 @@ See [the price data contract](docs/data.md) for input and timing conventions.
 - [x] Implement lagged momentum signals with synthetic-data tests.
 - [x] Implement portfolio accounting, turnover, and costs.
 - [x] Add volatility targeting and exposure limits.
-- [ ] Add chronological walk-forward evaluation and benchmarks.
+- [x] Add chronological walk-forward evaluation and benchmarks.
 - [ ] Add diagnostics and a reproducible example.
 
 This repository is research software. Results should document assumptions,
@@ -142,3 +142,17 @@ Exposure limits apply at order sizing; intervening price moves can exceed
 those limits at execution. This daily close model allows shorts and negative
 cash, omits financing and borrow fees, and assumes fractional adjusted-price
 units. It is a reproducible research convention, not an execution simulator.
+
+## Walk-forward comparison
+
+`evaluate_walk_forward` in `tsmom_etf.evaluation` selects a momentum lookback
+using only training net returns, then freezes that parameter for the next
+complete test block. Candidate order breaks ties. Each test starts from cash,
+uses earlier prices for causal feature warmup, and compares the strategy,
+equal-weight buy-and-hold, and cash on identical dates. Trading costs apply
+to strategy and buy-and-hold entries. Gap rows may warm features but do not
+contribute to training scores or test P&L.
+
+Folds reset capital and holdings; their summaries are independent experiments,
+not a stitched equity curve. This small grid search does not correct for
+multiple testing. Keep a separate untouched holdout for final research claims.

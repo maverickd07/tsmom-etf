@@ -13,6 +13,7 @@ def run_momentum(
     initial_cash: float = 10000.0, cost_bps: float = 0.0,
     target_vol: float = 0.10, max_asset_exposure: float = 1.0,
     gross_limit: float = 1.0, periods_per_year: int = 252,
+    trade_start: int = 0,
 ) -> List[PortfolioStep]:
     """Size share orders from prior closes, execute at the next close.
 
@@ -21,9 +22,12 @@ def run_momentum(
     then filled at close i. They first earn the move from i to i+1. Price moves
     before execution can make actual exposure exceed the sizing limits; these
     are order-sizing limits, not guaranteed post-fill exposure bounds.
+    trade_start suppresses trading before that row while retaining feature history.
     Capital is fixed at initial_cash, not reinvested equity. No final
     liquidation is assumed. Price rows must be synchronized and equally spaced.
     """
+    if isinstance(trade_start, bool) or not isinstance(trade_start, int) or trade_start < 0:
+        raise ValueError("trade_start must be a nonnegative row index")
     rows = [(day, dict(panel)) for day, panel in prices]
     account_portfolio(rows, {}, initial_cash, cost_bps)
     # Validate parameters even for an empty input.
@@ -42,7 +46,7 @@ def run_momentum(
         scales[symbol] = [None] + lagged_volatility_scale(
             returns, vol_window, target_vol, max_asset_exposure, periods_per_year)
     targets = {}
-    for i in range(1, len(rows)):
+    for i in range(max(1, trade_start), len(rows)):
         weights = {}
         for symbol in directions:
             direction = directions[symbol][i].direction
