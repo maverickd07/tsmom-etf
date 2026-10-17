@@ -118,3 +118,14 @@ cash with zero interest. Both use the strategy accounting ledger and validate
 the synchronized price panel. Compare strategies over identical evaluation
 dates, capital, and cost assumptions; these helpers do not select parameters
 or run walk-forward evaluation themselves.
+
+## Performance diagnostics
+
+`tsmom_etf.diagnostics.summarize_performance` reports net total return,
+nonpositive maximum drawdown, annualized sample volatility, total costs, and
+traded notional divided by initial capital. Initial capital anchors return
+and drawdown so entry fees remain visible. Volatility uses subsequent
+close-to-close returns with an explicit sessions-per-year assumption; it is
+undefined (`None`) with fewer than two intervals. Nonpositive equity is
+rejected. These summaries do not infer risk-free rates, financing costs, or
+statistical significance and do not replace out-of-sample evaluation.
