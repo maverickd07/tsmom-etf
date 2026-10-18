@@ -14,6 +14,8 @@ class PortfolioStep:
     cost: float
     cash: float
     equity: float
+    gross_market_value: float = 0.0
+    net_market_value: float = 0.0
 
 
 def account_portfolio(
@@ -70,10 +72,12 @@ def account_portfolio(
             holdings = target
         cost = traded * cost_bps / 10000.0
         cash -= cost
-        equity = cash + sum(q * panel[s] for s, q in holdings.items())
-        if not all(math.isfinite(v) for v in (gross, traded, cost, cash, equity)):
+        net_value = sum(q * panel[s] for s, q in holdings.items())
+        gross_value = sum(abs(q * panel[s]) for s, q in holdings.items())
+        equity = cash + net_value
+        if not all(math.isfinite(v) for v in (gross, traded, cost, cash, equity, gross_value, net_value)):
             raise ValueError("accounting overflow")
-        results.append(PortfolioStep(day, gross, traded, cost, cash, equity))
+        results.append(PortfolioStep(day, gross, traded, cost, cash, equity, gross_value, net_value))
         previous, last_day = panel, day
         seen.add(day)
     if not executed_holdings.keys() <= seen:

@@ -5,8 +5,10 @@ walk-forward evaluation, transaction costs, and transparent diagnostics.
 
 ## Status
 
-Package scaffold and input data conventions are in place. No strategy results
-have been produced yet.
+The research pipeline includes validated prices, delayed momentum execution,
+risk sizing, transaction costs, walk-forward comparisons, and a deterministic
+multi-asset example. Only synthetic integration results have been produced;
+real ETF data validation and empirical research remain outstanding.
 
 ## Development setup
 
@@ -174,3 +176,13 @@ Weekday labels do not model exchange holidays. These synthetic results verify
 software behavior and say nothing about achievable ETF returns. For real data,
 provide a documented common-currency adjusted-price snapshot and resolve
 calendar gaps explicitly before annualizing statistics.
+
+## Actual exposure diagnostics
+
+Ledger snapshots include post-trade gross and net market values. Performance
+summaries report peak and mean gross exposure and mean net exposure, each
+normalized by contemporaneous post-cost equity. Means equally weight the
+supplied session snapshots. These actual exposures can exceed order-sizing
+limits because prices move before fills and fees reduce equity. Values are
+measured after close trades, not intraday or before liquidation; they do not
+reconstruct risk between snapshots.

@@ -16,6 +16,9 @@ class PerformanceSummary:
     total_cost: float
     traded_notional: float
     turnover_on_initial_capital: float
+    max_gross_exposure: float = 0.0
+    mean_gross_exposure: float = 0.0
+    mean_net_exposure: float = 0.0
 
 
 def summarize_performance(
@@ -44,6 +47,7 @@ def summarize_performance(
     previous = None
     returns = []
     costs, traded = [], []
+    gross_exposures, net_exposures = [], []
     for row in rows:
         if previous is not None and row.date <= previous.date:
             raise ValueError("snapshot dates must strictly increase")
@@ -51,6 +55,12 @@ def summarize_performance(
             raise ValueError("equity must be finite and positive")
         if any(not math.isfinite(v) or v < 0 for v in (row.cost, row.traded_notional)):
             raise ValueError("costs and traded notional must be finite and nonnegative")
+        if (not math.isfinite(row.gross_market_value) or row.gross_market_value < 0
+                or not math.isfinite(row.net_market_value)
+                or abs(row.net_market_value) > row.gross_market_value + 1e-9):
+            raise ValueError("invalid market values for exposure diagnostics")
+        gross_exposures.append(row.gross_market_value / row.equity)
+        net_exposures.append(row.net_market_value / row.equity)
         peak = max(peak, row.equity)
         drawdown = min(drawdown, row.equity / peak - 1)
         if previous is not None:
@@ -67,4 +77,7 @@ def summarize_performance(
     if volatility is not None and not math.isfinite(volatility):
         raise ValueError("volatility arithmetic overflow")
     return PerformanceSummary(total_return, drawdown, volatility,
-                              total_cost, total_traded, turnover)
+                              total_cost, total_traded, turnover,
+                              max(gross_exposures),
+                              math.fsum(gross_exposures) / len(rows),
+                              math.fsum(net_exposures) / len(rows))
