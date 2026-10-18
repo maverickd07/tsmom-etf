@@ -156,3 +156,21 @@ contribute to training scores or test P&L.
 Folds reset capital and holdings; their summaries are independent experiments,
 not a stitched equity curve. This small grid search does not correct for
 multiple testing. Keep a separate untouched holdout for final research claims.
+
+## Reproducible example
+
+Run the deterministic two-asset integration example from the repository root:
+
+```sh
+PYTHONPATH=src python3 examples/synthetic_walk_forward.py
+```
+
+It generates artificial equity-like and bond-like price series, round-trips
+through the CSV validator, and prints a JSON report with three independent
+walk-forward folds, matched benchmarks, costs, drawdowns, and fixed-lookback
+sensitivity. The predeclared sensitivity grid is descriptive; do not choose
+a winner from test outcomes and present it as untouched out-of-sample evidence.
+Weekday labels do not model exchange holidays. These synthetic results verify
+software behavior and say nothing about achievable ETF returns. For real data,
+provide a documented common-currency adjusted-price snapshot and resolve
+calendar gaps explicitly before annualizing statistics.
