@@ -186,3 +186,22 @@ supplied session snapshots. These actual exposures can exceed order-sizing
 limits because prices move before fills and fees reduce equity. Values are
 measured after close trades, not intraday or before liquidation; they do not
 reconstruct risk between snapshots.
+
+## Run a CSV snapshot
+
+Use a synchronized, common-currency adjusted-price CSV following the data
+contract. For example, with a sufficiently long daily snapshot:
+
+```sh
+PYTHONPATH=src python3 -m tsmom_etf data/prices.csv \
+  --train-size 504 --test-size 63 --vol-window 20 --lookbacks 21 63 126 \
+  --provider "YOUR_PROVIDER" --currency USD \
+  --adjustment "YOUR_PROVIDER_ADJUSTMENT_CONVENTION" > outputs/report.json
+```
+
+Create `outputs/` before redirecting. JSON includes the exact input SHA-256,
+user-supplied provenance, symbols, parameters, dated folds, and performance
+summaries. Provenance labels describe the input; the program cannot verify
+provider adjustment quality or exchange calendars. Incomplete symbol panels
+and insufficient evaluation history fail explicitly. Preserve source download
+time and provider metadata alongside the CSV as described in the data contract.
