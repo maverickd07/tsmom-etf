@@ -23,6 +23,7 @@ def main(argv=None):
     parser.add_argument("--expanding", action="store_true")
     parser.add_argument("--initial-cash", type=float, default=10000)
     parser.add_argument("--cost-bps", type=float, default=5)
+    parser.add_argument("--symbols", nargs="+", help="Expected complete symbol universe")
     parser.add_argument("--provider", required=True)
     parser.add_argument("--currency", required=True)
     parser.add_argument("--adjustment", required=True)
@@ -36,6 +37,16 @@ def main(argv=None):
         for observation in observations:
             grouped.setdefault(observation.date, {})[observation.symbol] = observation.adjusted_close
         panel = sorted(grouped.items())
+        actual_symbols = {observation.symbol for observation in observations}
+        if args.symbols is not None:
+            expected = set(args.symbols)
+            if (len(expected) != len(args.symbols)
+                    or any(not symbol or symbol != symbol.strip() for symbol in expected)):
+                raise ValueError("expected symbols must be unique and nonempty without surrounding whitespace")
+            if actual_symbols != expected:
+                missing = sorted(expected - actual_symbols)
+                unexpected = sorted(actual_symbols - expected)
+                raise ValueError("symbol universe mismatch: missing={}, unexpected={}".format(missing, unexpected))
         folds = evaluate_walk_forward(
             panel, args.lookbacks, args.train_size, args.test_size, args.vol_window,
             args.gap, args.expanding, args.initial_cash, args.cost_bps)

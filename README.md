@@ -205,3 +205,10 @@ summaries. Provenance labels describe the input; the program cannot verify
 provider adjustment quality or exchange calendars. Incomplete symbol panels
 and insufficient evaluation history fail explicitly. Preserve source download
 time and provider metadata alongside the CSV as described in the data contract.
+
+Declare the intended universe with `--symbols SYMBOL_A SYMBOL_B ...` when
+running a CSV snapshot. The command rejects missing or unexpected instruments,
+including an instrument absent from the entire file, and records the declared
+universe in the report parameters. Every date must still contain the complete
+panel. This option validates identifiers only; liquidity, historical membership,
+common currency, and survivorship assumptions require dataset research.

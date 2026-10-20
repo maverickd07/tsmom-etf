@@ -10,7 +10,7 @@ from tsmom_etf.__main__ import main
 
 
 class CliTests(unittest.TestCase):
-    def invoke(self, content):
+    def invoke(self, content, symbols=None):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "prices.csv"
             path.write_text(content)
@@ -19,7 +19,8 @@ class CliTests(unittest.TestCase):
                 main([str(path), "--train-size", "6", "--test-size", "3",
                       "--vol-window", "2", "--lookbacks", "1", "2",
                       "--provider", "synthetic", "--currency", "USD",
-                      "--adjustment", "synthetic total return"])
+                      "--adjustment", "synthetic total return"]
+                     + (["--symbols"] + symbols if symbols is not None else []))
             return json.loads(output.getvalue())
 
     def test_report_contains_digest_and_parameters(self):
@@ -36,3 +37,22 @@ class CliTests(unittest.TestCase):
             with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
                 self.invoke(content)
             self.assertEqual(error.exception.code, 2)
+
+    def test_expected_universe_matches_and_is_recorded(self):
+        content = "date,symbol,adjusted_close\n" + "".join(
+            "2024-01-{:02d},A,{}\n".format(i+1, 100+i) for i in range(12))
+        report = self.invoke(content, ["A"])
+        self.assertEqual(report["parameters"]["symbols"], ["A"])
+        for symbols in [["A", "B"], ["B"], ["A", "A"], [" A"]]:
+            with self.subTest(symbols=symbols), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as error:
+                    self.invoke(content, symbols)
+                self.assertEqual(error.exception.code, 2)
+
+    def test_missing_observation_in_expected_panel_fails(self):
+        content = "date,symbol,adjusted_close\n" + "".join(
+            "2024-01-{:02d},A,100\n".format(i+1)
+            + ("2024-01-{:02d},B,100\n".format(i+1) if i != 5 else "")
+            for i in range(12))
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            self.invoke(content, ["A", "B"])
