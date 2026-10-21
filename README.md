@@ -39,7 +39,7 @@ See [the price data contract](docs/data.md) for input and timing conventions.
 - [x] Implement portfolio accounting, turnover, and costs.
 - [x] Add volatility targeting and exposure limits.
 - [x] Add chronological walk-forward evaluation and benchmarks.
-- [ ] Add diagnostics and a reproducible example.
+- [x] Add diagnostics and a reproducible example.
 
 This repository is research software. Results should document assumptions,
 data limitations, and the distinction between historical tests and live trading.
@@ -212,3 +212,16 @@ including an instrument absent from the entire file, and records the declared
 universe in the report parameters. Every date must still contain the complete
 panel. This option validates identifiers only; liquidity, historical membership,
 common currency, and survivorship assumptions require dataset research.
+
+## Validation and research status
+
+The version 0.1.0 software roadmap is implemented. Validation includes the
+52-test synthetic suite, a wheel build and install in a clean Python 3.9
+virtual environment, module CLI startup outside the source tree, and the
+installed-package multi-asset example. This verifies software integration,
+not historical investment performance.
+
+Empirical work remains separate: acquire a licensed adjusted-price snapshot,
+document the ETF universe and historical membership, verify currency and
+session calendars, and reserve an untouched holdout before examining results.
+No real ETF backtest performance or liquidity validation is claimed here.
